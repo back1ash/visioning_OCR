@@ -2,11 +2,13 @@ import numpy as np
 from PIL import Image
 import pytesseract
 
-pytesseract.pytesseract.tesseract_cmd = r"D:\tesseract\tesseract.exe"
 class Tesseract():
   def __init__(self):
-    pytesseract.pytesseract.tesseract_cmd = r"D:\tesseract\tesseract.exe"
     pass
+
+  def setPath(self, path):
+    self.path = path
+    pytesseract.pytesseract.tesseract_cmd = r"{}".format(path)
     
   def translate(path):
     filename = path
