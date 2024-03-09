@@ -10,6 +10,7 @@ class Ui_mainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.image = r"visioning_OCR\sample\sample1.png"
+        self.text = "Tesseract sample"
         self.setupUi()
 
     def setupUi(self):
@@ -23,24 +24,26 @@ class Ui_mainWindow(QMainWindow):
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         
-        label = QLabel(self.centralwidget)
-        label.setObjectName("label")
-        label.setGeometry(QRect(20, 20, 450, 200))
-        sizePolicy.setHeightForWidth(label.sizePolicy().hasHeightForWidth())
-        label.setSizePolicy(sizePolicy)
-        label.setPixmap(QPixmap(self.image))
-        label.setScaledContents(True)
+        self.label = QLabel(self.centralwidget)
+        self.label.setObjectName("label")
+        self.label.setGeometry(QRect(20, 20, 450, 200))
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
+        self.label.setPixmap(QPixmap(self.image))
+        self.label.setScaledContents(True)
 
-        textBrowser = QTextBrowser(self.centralwidget)
-        textBrowser.setObjectName("textBrowser")
-        textBrowser.setGeometry(QRect(20, 240, 450, 200))
-        sizePolicy.setHeightForWidth(textBrowser.sizePolicy().hasHeightForWidth())
-        textBrowser.setSizePolicy(sizePolicy)
+        self.textBrowser = QTextBrowser(self.centralwidget)
+        self.textBrowser.setObjectName("textBrowser")
+        self.textBrowser.setGeometry(QRect(20, 240, 450, 200))
+        sizePolicy.setHeightForWidth(self.textBrowser.sizePolicy().hasHeightForWidth())
+        self.textBrowser.setSizePolicy(sizePolicy)
+        self.textBrowser.setText(self.text)
 
         fileBtn = QPushButton(self.centralwidget)
         fileBtn.setObjectName("fileSelectButton")
         fileBtn.setGeometry(QRect(500, 100, 75, 23))
         fileBtn.setText("파일 선택")
+        fileBtn.clicked.connect(self.redraw)
 
         copyBtn = QPushButton(self.centralwidget)
         copyBtn.setObjectName("CopyButton")
@@ -63,8 +66,21 @@ class Ui_mainWindow(QMainWindow):
         QMetaObject.connectSlotsByName(self)
         
     def findFile(self):
-        fname = QFileDialog.getOpenFileName(self, filter='exe File(*.exe) ;; All File(*)')
+        fname = QFileDialog.getOpenFileName(self, filter='All File(*) ;; exe File(*.exe) ;; bmp File(*.bmp) ;; jpge File(*.jpge) ;; png File(*.png)')
         return fname[0]
+    
+    def redraw(self):
+        formats = [".bmp", ".jpge", ".png"]
+
+        path = self.findFile()
+        format = os.path.splitext(path)[1]
+        if format not in formats:
+            QMessageBox.critical(self, '파일 선택 오류', '.bmp | .jpge | .png 확장자만 지원합니다.')
+            return
+        self.image = r"{}".format(path)
+        self.label.setPixmap(QPixmap(self.image))
+        # self.ocr(path)
+        
     
     def setTesseract(self):
         path = self.findFile()
@@ -72,14 +88,17 @@ class Ui_mainWindow(QMainWindow):
         if filename != "tesseract.exe":
             QMessageBox.critical(self, '파일 선택 오류', 'tesseract.exe를 선택한게 맞는지 확인해주십시오.')
             return
+        print(path)
         tesseract.setPath(path)
 
-    def ocr(self):
-        pass
+    # def ocr(self, path):
+    #     self.text = tesseract.translate(path)
+    #     self.textBrowser.setText = self.text
+    #     print(self.text)
+        
 
-
-app = QApplication(sys.argv)
 tesseract = Tesseract()
+app = QApplication(sys.argv)
 window = Ui_mainWindow()
 window.show()
 sys.exit(app.exec())

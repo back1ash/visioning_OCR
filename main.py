@@ -10,7 +10,7 @@ class Tesseract():
     self.path = path
     pytesseract.pytesseract.tesseract_cmd = r"{}".format(path)
     
-  def translate(path):
+  def translate(self, path):
     filename = path
     img = np.array(Image.open(filename))
     text = pytesseract.image_to_string(img)
